@@ -4,6 +4,46 @@
 
 using namespace std;
 
+class Exc
+{
+public:
+    virtual void PrintErrMsg() const = 0;
+};
+
+class ExcDivideByZero : public Exc
+{
+public:
+    void PrintErrMsg() const
+    {
+        cout << "Was attempt to divide by zero"<<endl;
+    }
+};
+
+class ExcStrEnd : public Exc
+{
+public:
+    void PrintErrMsg() const
+    {
+        cout << "Expression was not completed"<<endl;
+    }
+};
+
+class ExcWrongLex : public Exc
+{
+    int exc_lex_name;
+    //int is_zero;
+    //char *args;
+
+public:
+    ExcWrongLex(int name) { exc_lex_name = name; }
+
+    int GetExcLex() const { return exc_lex_name; }
+    void PrintErrMsg() const
+    {
+        cout << "Didn't expected to get \'"<< (char)GetExcLex() << "\'"<<endl;
+    }
+};
+
 class Parser
 {
     static char *curr_lex;
@@ -15,12 +55,19 @@ class Parser
             curr_lex++;
     }
     
-    static int GetCurrLex() { return *curr_lex; }
+    static int GetCurrLex()
+    {
+        //if (*curr_lex == 0)
+          //  throw ExcStrEnd();
+        return *curr_lex;
+    }
     
     static void NextLex()
     {
         if (*curr_lex == 0)
-            throw "err";
+        {
+            throw ExcStrEnd();
+        }
         curr_lex = curr_lex + 1;
         while (*curr_lex == ' ')
             curr_lex++;
@@ -49,7 +96,7 @@ class Parser
             return -Factor();
         }
         else
-            throw GetCurrLex();
+            throw ExcWrongLex(GetCurrLex());
     }
 
     static double MoreFactor()
@@ -62,7 +109,10 @@ class Parser
         if (GetCurrLex() == '/')
         {
             NextLex();
-            return 1 / Factor() * MoreFactor();
+            int num = Factor();
+            if (num == 0)
+                throw ExcDivideByZero();
+            return 1 / num * MoreFactor();
         }
         return 1;
     }
@@ -106,17 +156,20 @@ char* Parser::curr_lex;
 int main(int argc, char** argv)
 {
     double res = 0;
-    
     if (argc != 2)
     {
         cerr << "wrong input" << endl;
-        exit(1);
+        return 1;
     }
     try
     {
         res = Parser::Calc(argv[1]);
     }
-    catch(const char *err) { cerr << "was error\n" << endl; }
+    catch(const Exc &err)
+    {
+        err.PrintErrMsg();
+        return 1;
+    }
     cout << res << endl;
     return 0;
 }
