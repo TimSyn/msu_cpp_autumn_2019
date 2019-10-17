@@ -5,10 +5,10 @@ CFLAGS= -g -Wall -std=c++14
 all: calc
 
 calc: calc.o
-	$(CC) $(FLAGS) calc.o -o calc
+	$(CC) $(CFLAGS) calc.o -o calc
 
 calc.o: calc.cpp
-	$(CC) $(FLAGS) -c calc.cpp
+	$(CC) $(CFLAGS) -c calc.cpp
 
 run: calc
 	./calc "2+-2 *2 + 3/ -1"

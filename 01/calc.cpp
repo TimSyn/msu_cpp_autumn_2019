@@ -19,15 +19,6 @@ public:
     }
 };
 
-class ExcStrEnd : public Exc
-{
-public:
-    void PrintErrMsg() const
-    {
-        cout << "Expression was not completed"<<endl;
-    }
-};
-
 class ExcWrongLex : public Exc
 {
     int exc_lex_name;
@@ -40,7 +31,10 @@ public:
     int GetExcLex() const { return exc_lex_name; }
     void PrintErrMsg() const
     {
-        cout << "Didn't expected to get \'"<< (char)GetExcLex() << "\'"<<endl;
+        if (exc_lex_name != 0)
+            cout << "Didn't expected to get \'"<< (char)GetExcLex() << "\'"<<endl;
+        else
+            cout << "Expression was not complete"<<endl;
     }
 };
 
@@ -57,8 +51,6 @@ class Parser
     
     static int GetCurrLex()
     {
-        //if (*curr_lex == 0)
-          //  throw ExcStrEnd();
         return *curr_lex;
     }
     
@@ -66,7 +58,7 @@ class Parser
     {
         if (*curr_lex == 0)
         {
-            throw ExcStrEnd();
+            throw ExcWrongLex(GetCurrLex());
         }
         curr_lex = curr_lex + 1;
         while (*curr_lex == ' ')
@@ -108,8 +100,9 @@ class Parser
         }
         if (GetCurrLex() == '/')
         {
+            //
             NextLex();
-            int num = Factor();
+            double num = Factor();
             if (num == 0)
                 throw ExcDivideByZero();
             return 1 / num * MoreFactor();
