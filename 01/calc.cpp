@@ -4,6 +4,27 @@
 
 using namespace std;
 
+class ExcStrEnd
+{
+public:
+    void PrintErrMsg() const
+    {
+        cout << "Expression was not completed"<<endl;
+    }
+};
+
+class ExcWrongLex
+{
+    int exc_lex_name;
+    //int is_zero;
+    //char *args;
+
+public:
+    ExcWrongLex(int name) { exc_lex_name = name; }
+
+    int GetExcLex() const { return exc_lex_name; }
+};
+
 class Parser
 {
     static char *curr_lex;
@@ -15,7 +36,12 @@ class Parser
             curr_lex++;
     }
     
-    static int GetCurrLex() { return *curr_lex; }
+    static int GetCurrLex()
+    {
+        if (*curr_lex == 0)
+            throw ExcStrEnd();
+        return *curr_lex;
+    }
     
     static void NextLex()
     {
@@ -49,7 +75,7 @@ class Parser
             return -Factor();
         }
         else
-            throw GetCurrLex();
+            throw ExcWrongLex(GetCurrLex());
     }
 
     static double MoreFactor()
@@ -106,17 +132,25 @@ char* Parser::curr_lex;
 int main(int argc, char** argv)
 {
     double res = 0;
-    
     if (argc != 2)
     {
         cerr << "wrong input" << endl;
-        exit(1);
+        return 1;
     }
     try
     {
         res = Parser::Calc(argv[1]);
     }
-    catch(const char *err) { cerr << "was error\n" << endl; }
+    catch(const ExcStrEnd &err)
+    {
+        err.PrintErrMsg();
+        return 1;
+    }
+    catch(const ExcWrongLex &lex)
+    {
+        cerr << "Didn't expect to get \'"<< (char)lex.GetExcLex()<< "\'" << endl;
+        return 1;
+    }
     cout << res << endl;
     return 0;
 }
