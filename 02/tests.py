@@ -19,12 +19,12 @@ def Test(arg, answ):
     else:
          print("Test FAILED")
 
-Test("./allocator 100", "Freed Mem")
-Test("./allocator 0", "Freed Mem")
+Test("./allocator 100", "")
+Test("./allocator 0", "")
 Test("./allocator 100 a10 a90 a1 r", ("Alloc: 10 Mem used: 10\n"
                         "Alloc: 90 Mem used: 100\n"
                         "Not alloc Mem used: 100\n"
                         "Reset: 1 Memory used: 0\n"
-                        "Freed Mem"))
-Test("./allocator 0 a10", ("Not alloc Mem used: 0\n" "Freed Mem"))
-Test("./allocator 100 a200", ("Not alloc Mem used: 0\n" "Freed Mem"))
+                        ""))
+Test("./allocator 0 a10", ("Not alloc Mem used: 0\n" ""))
+Test("./allocator 100 a200", ("Not alloc Mem used: 0\n" ""))

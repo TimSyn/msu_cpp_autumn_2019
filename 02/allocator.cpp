@@ -1,8 +1,6 @@
 #include <iostream>
 #include <stdlib.h>
 
-#define MEMORY_SIZE 1000
-
 using namespace std;
 
 class LinearAllocator
@@ -17,13 +15,18 @@ public:
     {
         buffSize = maxSize;
         buffer = (char*) malloc(sizeof(char) * maxSize);
+//        for (size_t i = 0; i < maxSize; i++)
+//            buffer[i] = 0;
         esp = buffer;
         allocated_last_time = 0;
     }
 
     size_t AllUsedMemory() { return esp - buffer; }
+
     size_t WasAllocated() { return allocated_last_time; }
+
     int IsOnTheFirstByte() { return buffer == esp; }
+
     char* alloc(size_t size)
     {
         if (size == 0) return nullptr;
@@ -34,6 +37,8 @@ public:
         {
             esp += size;
             allocated_last_time = size;
+//            for (size_t i = 0; i < size; i++)
+//                mem_pointer[i] = i % 10 + '0';
             return mem_pointer; 
         }   
     }
@@ -41,14 +46,10 @@ public:
     void reset()
     {
         esp = buffer;
-        
+//        for (size_t i =0; i< buffSize; i++) buffer[i] = 0;
     }
 
-    ~LinearAllocator()
-    {
-        delete buffer;
-        cout << "Freed Mem\n";
-    }
+    ~LinearAllocator() { free(buffer); }
 };
 
 size_t make_size_t(char *str_num)
@@ -66,16 +67,18 @@ size_t make_size_t(char *str_num)
 
 int main(int argc, char **argv)
 {
-    LinearAllocator linAlloc(make_size_t(argv[1]));
+    if (argc == 1) 
+        return 1;
+    LinearAllocator linAlloc(strtoul(argv[1], nullptr, 10));
     
     for (int i = 2; i < argc; i++)
     {
-        if (argv[i][0] == 'a')
+       if (argv[i][0] == 'a')
         {
-            if (linAlloc.alloc(make_size_t(argv[i] + 1)) != nullptr)
+            if (linAlloc.alloc(strtoul(argv[i] + 1, nullptr, 10)) != nullptr)
                 cout << "Alloc: " << linAlloc.WasAllocated() << " Mem used: " << linAlloc.AllUsedMemory() << endl;
             else
-                cout << "Not alloc "<< "Mem used: " << linAlloc.AllUsedMemory() << endl;
+                cout << "Not alloc " << "Mem used: " << linAlloc.AllUsedMemory() << endl;
         }
         else if (argv[i][0] == 'r' )
         {
