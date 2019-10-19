@@ -64,15 +64,17 @@ public:
 
 class Parser
 {
-    char *curr_lex;
+    const char *curr_lex;
+    char *my_str;
 
     void SetCurrLex() 
     {
+        curr_lex = my_str;
         while (*curr_lex == ' ')
             curr_lex++;
     }
     
-    int GetCurrLex()
+    const int GetCurrLex()
     {
         return *curr_lex;
     }
@@ -161,8 +163,8 @@ class Parser
 public:
     Parser(const char *str)
     {
-        curr_lex = new char[length(str)];
-        strcpy(curr_lex, str);
+        my_str = new char[length(str) + 1];
+        strcpy(my_str, str);
     }
     
     double Calc()
@@ -171,7 +173,7 @@ public:
         return CalcExpr();
     }
 
-    ~Parser() { delete [] curr_lex; }
+    ~Parser() { delete [] my_str; }
 };
 
 int main(int argc, char** argv)
