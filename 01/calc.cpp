@@ -1,60 +1,83 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <string.h>
+
+#define ERR_MSG_SIZE 30
 
 using namespace std;
 
+size_t length(const char* str)
+{
+    int i = 0;
+    
+    while (str[i])
+        i++;
+    return i;
+}
+
 class Exc
 {
+protected:
+    const char* err_msg;
+
 public:
-    virtual void PrintErrMsg() const = 0;
+    Exc() { err_msg = nullptr; }
+    virtual const char* GetErr() const = 0;
 };
 
 class ExcDivideByZero : public Exc
 {
 public:
-    void PrintErrMsg() const
+    ExcDivideByZero() { err_msg = "Was attempt to divide by zero\n"; }
+    const char* GetErr() const
     {
-        cout << "Was attempt to divide by zero"<<endl;
+        return err_msg;
     }
 };
 
 class ExcWrongLex : public Exc
 {
     int exc_lex_name;
-    //int is_zero;
-    //char *args;
+    char tmp_msg[ERR_MSG_SIZE];
 
 public:
-    ExcWrongLex(int name) { exc_lex_name = name; }
+    ExcWrongLex(int name)
+    {
+        exc_lex_name = name;
+        if (exc_lex_name != 0)
+        {
+            sprintf(tmp_msg, "%s %c %s","Didn't expected to get \'",(char)GetExcLex(),"\'\n");
+            err_msg = tmp_msg;
+        }
+        else
+            err_msg = "Expression was not complete\n";
+    }
 
     int GetExcLex() const { return exc_lex_name; }
-    void PrintErrMsg() const
+
+    const char* GetErr() const
     {
-        if (exc_lex_name != 0)
-            cout << "Didn't expected to get \'"<< (char)GetExcLex() << "\'"<<endl;
-        else
-            cout << "Expression was not complete"<<endl;
+        return err_msg;
     }
 };
 
 class Parser
 {
-    static char *curr_lex;
+    char *curr_lex;
 
-    static void SetCurrLex(char *ptr) 
+    void SetCurrLex() 
     {
-        curr_lex = ptr;
         while (*curr_lex == ' ')
             curr_lex++;
     }
     
-    static int GetCurrLex()
+    int GetCurrLex()
     {
         return *curr_lex;
     }
     
-    static void NextLex()
+    void NextLex()
     {
         if (*curr_lex == 0)
         {
@@ -65,7 +88,7 @@ class Parser
             curr_lex++;
     }
     
-    static int ExtractNumber()
+    int ExtractNumber()
     {
         int summ = 0;    
         
@@ -78,7 +101,7 @@ class Parser
         return summ;
     }
 
-    static double Factor()
+    double Factor()
     {
         if ((GetCurrLex() >= '0') && (GetCurrLex() <= '9')) 
             return ExtractNumber();
@@ -91,7 +114,7 @@ class Parser
             throw ExcWrongLex(GetCurrLex());
     }
 
-    static double MoreFactor()
+    double MoreFactor()
     {
         if (GetCurrLex() == '*')
         {
@@ -100,7 +123,6 @@ class Parser
         }
         if (GetCurrLex() == '/')
         {
-            //
             NextLex();
             double num = Factor();
             if (num == 0)
@@ -110,7 +132,7 @@ class Parser
         return 1;
     }
     
-    static double MoreTerm()
+    double MoreTerm()
     {
         if (GetCurrLex() == '+')
         {
@@ -126,29 +148,36 @@ class Parser
         return 0;
     }
 
-    static double Term()
+    double Term()
     {
         return Factor() * MoreFactor();
     }
     
-    static double CalcExpr()
+    double CalcExpr()
     {
         return Term() + MoreTerm();
     }
 
 public:
-    static double Calc(char *expr)
+    Parser(const char *str)
     {
-        SetCurrLex(expr);
+        curr_lex = new char[length(str)];
+        strcpy(curr_lex, str);
+    }
+    
+    double Calc()
+    {
+        SetCurrLex();
         return CalcExpr();
     }
-};
 
-char* Parser::curr_lex;
+    ~Parser() { delete [] curr_lex; }
+};
 
 int main(int argc, char** argv)
 {
     double res = 0;
+    
     if (argc != 2)
     {
         cerr << "wrong input" << endl;
@@ -156,11 +185,12 @@ int main(int argc, char** argv)
     }
     try
     {
-        res = Parser::Calc(argv[1]);
+         Parser pars(argv[1]);
+         res = pars.Calc();
     }
     catch(const Exc &err)
     {
-        err.PrintErrMsg();
+        cout << err.GetErr();
         return 1;
     }
     cout << res << endl;
