@@ -3,8 +3,6 @@
 #include <iostream>
 #include <string.h>
 
-#define ERR_MSG_SIZE 30
-
 using namespace std;
 
 size_t length(const char* str)
@@ -19,18 +17,18 @@ size_t length(const char* str)
 class Exc
 {
 protected:
-    const char* err_msg;
+    string err_msg;
 
 public:
-    Exc() { err_msg = nullptr; }
-    virtual const char* GetErr() const = 0;
+    Exc() { err_msg = string(); }
+    virtual string GetErr() const = 0;
 };
 
 class ExcDivideByZero : public Exc
 {
 public:
-    ExcDivideByZero() { err_msg = "Was attempt to divide by zero\n"; }
-    const char* GetErr() const
+    ExcDivideByZero() { err_msg = string("Was attempt to divide by zero"); }
+    string GetErr() const
     {
         return err_msg;
     }
@@ -39,7 +37,6 @@ public:
 class ExcWrongLex : public Exc
 {
     int exc_lex_name;
-    char tmp_msg[ERR_MSG_SIZE];
 
 public:
     ExcWrongLex(int name)
@@ -47,16 +44,17 @@ public:
         exc_lex_name = name;
         if (exc_lex_name != 0)
         {
-            sprintf(tmp_msg, "%s %c %s","Didn't expected to get \'",(char)GetExcLex(),"\'\n");
-            err_msg = tmp_msg;
+            err_msg = string("Didn't expected to get \'");
+            err_msg.append(1, (char)GetExcLex());
+            err_msg.append("\'");
         }
         else
-            err_msg = "Expression was not complete\n";
+            err_msg = string("Expression was not complete");
     }
 
     int GetExcLex() const { return exc_lex_name; }
 
-    const char* GetErr() const
+    string GetErr() const
     {
         return err_msg;
     }
@@ -192,7 +190,7 @@ int main(int argc, char** argv)
     }
     catch(const Exc &err)
     {
-        cout << err.GetErr();
+        cout << err.GetErr() <<endl;
         return 1;
     }
     cout << res << endl;

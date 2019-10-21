@@ -1,5 +1,5 @@
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 
 using namespace std;
 
@@ -13,12 +13,21 @@ class LinearAllocator
 public:
     LinearAllocator(size_t maxSize)
     {
-        buffSize = maxSize;
-        buffer = (char*) malloc(sizeof(char) * maxSize);
-//        for (size_t i = 0; i < maxSize; i++)
-//            buffer[i] = 0;
-        esp = buffer;
-        allocated_last_time = 0;
+        if (maxSize == 0)        
+        {
+            buffer = nullptr;
+            esp = nullptr;
+            buffSize = 0;
+        }
+        else
+        {  
+            buffSize = maxSize;
+            buffer = (char*) malloc(sizeof(char) * maxSize);
+//          for (size_t i = 0; i < maxSize; i++)
+//                buffer[i] = 0;
+            esp = buffer;
+            allocated_last_time = 0;
+        }
     }
 
     size_t AllUsedMemory() { return esp - buffer; }
@@ -29,7 +38,7 @@ public:
 
     char* alloc(size_t size)
     {
-        if (size == 0) return nullptr;
+        if ((size == 0) or (buffer == nullptr)) return nullptr;
         char *mem_pointer = esp; 
         if ((size_t)(esp + size - buffer) > buffSize)
             return nullptr;
@@ -69,7 +78,7 @@ int main(int argc, char **argv)
 {
     if (argc == 1) 
         return 1;
-    LinearAllocator linAlloc(strtoul(argv[1], nullptr, 10));
+    LinearAllocator linAlloc(strtoul(argv[1], NULL, 10));
     
     for (int i = 2; i < argc; i++)
     {
