@@ -62,30 +62,31 @@ public:
 
 class Parser
 {
-    const char *curr_lex;
-    char *my_str;
+    int lex_index;
+    //const char curr_lex;
+    string my_str;
 
     void SetCurrLex() 
     {
-        curr_lex = my_str;
-        while (*curr_lex == ' ')
-            curr_lex++;
+        //curr_lex = my_str[lex_index];
+        while (my_str[lex_index] == ' ')
+            lex_index++;
     }
     
     const int GetCurrLex()
     {
-        return *curr_lex;
+        return my_str[lex_index];
     }
     
     void NextLex()
     {
-        if (*curr_lex == 0)
+        if (my_str[lex_index] == 0)
         {
             throw ExcWrongLex(GetCurrLex());
         }
-        curr_lex = curr_lex + 1;
-        while (*curr_lex == ' ')
-            curr_lex++;
+        lex_index++;
+        while (my_str[lex_index] == ' ')
+            lex_index++;
     }
     
     int ExtractNumber()
@@ -161,8 +162,9 @@ class Parser
 public:
     Parser(const char *str)
     {
-        my_str = new char[length(str) + 1];
-        strcpy(my_str, str);
+        my_str = string(str);
+        lex_index = 0;
+        //strcpy(my_str, str);
     }
     
     double Calc()
@@ -171,7 +173,7 @@ public:
         return CalcExpr();
     }
 
-    ~Parser() { delete [] my_str; }
+    //~Parser() { delete [] my_str; }
 };
 
 int main(int argc, char** argv)
