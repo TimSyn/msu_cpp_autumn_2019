@@ -2,6 +2,8 @@
 #include "matrix.h"
 #include <cassert>
 
+using namespace std;
+
 int main()
 {
     Matrix m(3,5), a(3,5), b(3,5);

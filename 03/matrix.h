@@ -1,111 +1,102 @@
 #include <iostream>
 
-using namespace std;
-
 class Row
 {
-    int col_am;
+    size_t col_am;
     int* row;
 
 public:
-    Row(int* row_ptr, int col_am)
+    Row(int* row_ptr, size_t col_am)
     {
         row = row_ptr;
         this->col_am = col_am;
     }    
 
-    int& operator[](int col_ind)
+    int& operator[](size_t col_ind)
     {
         if ((col_ind <= col_am) && (col_ind >= 0))
         {        
-            int* tmp = row;
-            delete this;
-            return tmp[col_ind];
+            //int* tmp = row;
+            //delete this;
+            return row[col_ind];
         }
         else
-            throw out_of_range("");
+            throw std::out_of_range("");
     }
 };
 
 class Matrix
 {
-    int row_am, col_am;
+    size_t row_am, col_am;
     int *my_matrix;
 
 public:
-    Matrix(int rows_am=0, int cols_am=0)
+    Matrix(size_t rows_am=0, size_t cols_am=0)
     {
         this->row_am = rows_am;
         this->col_am = cols_am;
         
         if (rows_am && col_am)
-        {
-            my_matrix = new int[rows_am * cols_am];
-            Init();
-        }
+            my_matrix = new int[rows_am * cols_am]();
         else
             my_matrix = nullptr;
     }
 
     ~Matrix() { if (my_matrix != nullptr) delete [] my_matrix; }
     
-    int* getMatrPtr() { return my_matrix; }
+    int* getMatrPtr() const { return my_matrix; }
 
     void Init()
     {
-        for (int i=0; i<row_am; i++)
-            for (int j=0; j<col_am; j++)
+        for (size_t i=0; i<row_am; i++)
+            for (size_t j=0; j<col_am; j++)
                 my_matrix[j + i*col_am] = 0;
     }
     
-    void Print()
+    void Print() const
     {
-        for (int i=0; i<row_am; i++)
+        for (size_t i=0; i<row_am; i++)
         {
-            if (i != 0) cout << endl;
-            for (int j=0; j<col_am; j++)
-                cout << my_matrix[j + i*col_am] <<' ';
+            if (i != 0) std::cout << std::endl;
+            for (size_t j=0; j<col_am; j++)
+                std::cout << my_matrix[j + i*col_am] <<' ';
         }
-        cout << endl;
+        std::cout << std::endl;
     }
 
-    int getRows() { return row_am; }
+    size_t getRows() const { return row_am; }
 
-    int getColumns() { return col_am; }
+    size_t getColumns() const { return col_am; }
     
-    void operator*=(int num)
+    Matrix& operator*=(int num)
     {
-        for (int i=0; i<row_am; i++)
-            for (int j=0; j<col_am; j++)
+        for (size_t i=0; i<row_am; i++)
+            for (size_t j=0; j<col_am; j++)
                 my_matrix[j + i*col_am] *= num;
+        return *this;
     }
     
-    bool operator==(Matrix &matr)
+    bool operator==(const Matrix &matr) const
     {
-        bool flag = true;
-        
         if ((matr.getColumns() != getColumns()) ||
             (matr.getRows() != getRows()))
             return false;
 
-        for (int i=0; i<row_am; i++)
-            for (int j=0; j<col_am; j++)
-                if (my_matrix[j + i*col_am] != matr.getMatrPtr()[j + i*col_am])
-                {
-                    flag = false;
-                    break;
-                }
+        for (size_t i=0; i<row_am; i++)
+            for (size_t j=0; j<col_am; j++)
+                if (my_matrix[j + i*col_am] != matr.my_matrix[j + i*col_am])
+                    return false;
 
-        return flag;
+        return true;
     }
     
-    bool operator!=(Matrix &matr) { return !(*this == matr); }
+    bool operator!=(const Matrix &matr) const { return !(*this == matr); }
 
-    Row& operator[](int row_ind)
+    Row operator[](size_t row_ind)
     {
         if ((row_ind < row_am) && (row_ind >= 0))
-            return *(new Row(my_matrix + col_am * row_ind, col_am));
+            return Row(my_matrix + col_am * row_ind, col_am);
         else 
-            throw out_of_range("");
+            throw std::out_of_range("");
     }
 };
