@@ -23,6 +23,18 @@ public:
         else
             throw std::out_of_range("");
     }
+    int operator[](size_t col_ind) const
+    {
+        if ((col_ind <= col_am) && (col_ind >= 0))
+        {        
+            //int* tmp = row;
+            //delete this;
+            return row[col_ind];
+        }
+        else
+            throw std::out_of_range("");
+    }
+
 };
 
 class Matrix
@@ -93,6 +105,14 @@ public:
     bool operator!=(const Matrix &matr) const { return !(*this == matr); }
 
     Row operator[](size_t row_ind)
+    {
+        if ((row_ind < row_am) && (row_ind >= 0))
+            return Row(my_matrix + col_am * row_ind, col_am);
+        else 
+            throw std::out_of_range("");
+    }
+
+    const Row operator[](size_t row_ind) const
     {
         if ((row_ind < row_am) && (row_ind >= 0))
             return Row(my_matrix + col_am * row_ind, col_am);
