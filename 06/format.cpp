@@ -65,7 +65,7 @@ std::string format(const std::string &raw_str,
     size_t counter = 0;
     bool was_opened = false;
     
-    while (raw_str[counter])
+    while (counter < raw_str.length())
     {
         if ((raw_str[counter] == '{') && (!was_opened))
         {
@@ -76,13 +76,19 @@ std::string format(const std::string &raw_str,
         }
         else if ((raw_str[counter] == '}') && (was_opened))
         {
-            int numb = std::stoi(arg_numb), vec_size = word_vect.size();
+            int numb = 1, vec_size = word_vect.size();
+            
+            counter++;
+            was_opened = false;
+            
+            if (arg_numb != "")
+                numb = std::stoi(arg_numb);
+            else
+                continue;
             
             if ((numb >= 0) && (vec_size > numb))
             {
                 new_str.append(word_vect[numb]);
-                counter++;
-                was_opened = false;
                 continue;
             }
             else
