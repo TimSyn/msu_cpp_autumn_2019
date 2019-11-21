@@ -36,7 +36,7 @@ std::vector<std::string> my_split(std::string my_str, char sep)
         if (my_str[counter] == sep)
         {
             if (!tmp_str.empty())
-                res.push_back(tmp_str);
+                res.push_back(std::move(tmp_str));
             tmp_str = std::string("");
             counter++;
             continue;

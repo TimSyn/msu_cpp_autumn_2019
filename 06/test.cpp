@@ -1,5 +1,5 @@
 #include <iostream>
-#include "format.cpp"
+#include "format.h"
 #include <cassert>
 
 using namespace std;
