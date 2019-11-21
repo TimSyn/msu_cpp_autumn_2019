@@ -11,5 +11,5 @@ run: test
 clean:
 	rm -rf *.o test
 
-test: test.cpp format.cpp
+test: test.cpp format.h
 	$(CC) $(CFLAGS) test.cpp -o test

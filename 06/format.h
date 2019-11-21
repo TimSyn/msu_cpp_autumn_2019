@@ -22,7 +22,7 @@ void write_to_stream(std::stringstream &stream, char sep,
                         T&& arg, Args&&... args)
 {
     stream << arg << sep;
-    write_to_stream(stream, sep, args...);
+    write_to_stream(stream, sep, std::forward<Args>(args)...);
 }
 
 std::vector<std::string> my_split(std::string my_str, char sep)
@@ -57,7 +57,7 @@ std::string format(const std::string &raw_str,
     if (raw_str == "")
         return "";
 
-    write_to_stream(stream, ' ', args...);
+    write_to_stream(stream, ' ', std::forward<Args>(args)...);
     std::vector<std::string> word_vect = my_split(stream.str(), ' ');
 
     std::string new_str("");

@@ -5,7 +5,7 @@
 #include <sstream>
 #include <string>
 
-std::list<std::string> my_split(std::string my_str, char sep)
+std::list<std::string> my_split(std::string &my_str, char sep)
 {
     std::string tmp_str("");
     std::list<std::string> res;
@@ -48,19 +48,20 @@ public:
     template <typename T>
     Error Save(const T &data) { return data.serialize(*this); }
 
+    void proc_bool(bool arg) const
+    {
+        if (arg)
+            (*stream) << "true" << sep;
+        else
+            (*stream) << "false" << sep;
+    }
+
     template <typename T>
     Error operator()(T first) const
     {  
-        std::string my_str("");
-     
         if (std::is_same<T, bool>::value)
         {
-            if (first)
-                my_str.append("true");
-            else
-                my_str.append("false");
-            my_str.append(&sep);
-            (*stream) << my_str;
+            proc_bool(first);
             return Error::NoError;
         }
         else if (std::is_same<T, std::uint64_t>::value)
@@ -79,12 +80,7 @@ public:
      
         if (std::is_same<T, bool>::value)
         {
-            if (first)
-                my_str.append("true");
-            else
-                my_str.append("false");
-            my_str.append(&sep);
-            (*stream) << my_str;
+            proc_bool(first);
             if ((*this)(args...) == Error::NoError)
                 return Error::NoError;
             else
