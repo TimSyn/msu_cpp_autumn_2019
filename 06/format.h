@@ -25,7 +25,7 @@ void write_to_stream(std::stringstream &stream, char sep,
     write_to_stream(stream, sep, std::forward<Args>(args)...);
 }
 
-std::vector<std::string> my_split(std::string my_str, char sep)
+std::vector<std::string> my_split(std::string &my_str, char sep)
 {
     std::string tmp_str("");
     std::vector<std::string> res;
